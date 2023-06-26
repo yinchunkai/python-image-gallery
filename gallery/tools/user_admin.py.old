@@ -1,0 +1,86 @@
+import psycopg2
+from enum import unique, Enum
+from db import Db
+
+@unique
+class MenuChoice(Enum):
+    LIST = 1
+    ADD = 2
+    EDIT = 3
+    DELETE = 4
+    QUIT = 5
+
+def get_choice():
+    print("\n\n1) List users")
+    print("2) Add user")
+    print("3) Edit user")
+    print("4) Delete user")
+    print("5) Quit")
+    return MenuChoice(int(input("Enter command > ")))
+
+def list_accounts(db):
+    res = db.execute('select * from accounts.Account')
+    print(f'username\tpassword\tfull name')
+    print('----------------------------------------')
+    for row in res:
+        print(f'{row[0]}\t\t{row[1]}\t\t{row[2]}')
+
+def add_account(db):
+   user_name = input("Username> ")
+   passwd = input("Password> ")
+   full_name = input("Full name> ")
+   try:
+    res = db.execute('INSERT INTO accounts.Account VALUES (%s, %s, %s)', (user_name, passwd, full_name))
+    db.connection.commit()
+   except psycopg2.errors.UniqueViolation as e:
+       print(f"Error: user with username {user_name} already exists")
+
+def edit_account(db):
+   user_name = input("Username to edit> ")
+   print(f'username:{user_name}')
+   res = db.execute('SELECT * FROM accounts.Account WHERE user_name = %s', (user_name,))
+   usr_n = None
+   for row in res:
+       usr_n=row[0]
+       break
+   if usr_n is None:
+       print("No such user.")
+       return
+   passwd = str(input("New Password (press enter to keep current)> "))
+   full_name = str(input("New Full name (press enter to keep current)> "))
+   passwd = row[1] if passwd == "" else passwd
+   full_name = row[2] if full_name == "" else full_name
+
+   res = db.execute('UPDATE accounts.Account SET user_password = %s, full_name = %s where user_name = %s', (passwd, full_name, user_name))
+   db.connection.commit()
+
+def del_account(db):
+   user_name = input("Enter username to delete> ")
+   confirm = input(f"Are you sure that you want to delete {user_name}?> ")
+   if confirm in ['Y','y','Yes','yes', 'YES']:
+    db.execute('DELETE from accounts.Account WHERE user_name = %s', (user_name))
+    db.connection.commit()
+    print('deleted.')
+
+
+def main():
+
+    db = Db()
+    db.connect()
+    choice = get_choice()
+    while choice != MenuChoice.QUIT:
+        if choice == MenuChoice.LIST:
+            list_accounts(db)
+        elif choice == MenuChoice.ADD:
+            add_account(db)
+        elif choice == MenuChoice.EDIT:
+            edit_account(db)
+        elif choice == MenuChoice.DELETE:
+            del_account(db)
+        db.connect()
+        choice = get_choice()
+
+    print("Bye.")
+
+if __name__ == '__main__':
+    main()

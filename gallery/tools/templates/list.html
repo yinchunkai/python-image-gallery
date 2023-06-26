@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>list all users</title>
+</head>
+<body>
+
+<ol>
+    <!-- For loop logic of jinja template -->
+    {%for i in range(0, len)%}
+    <li><a href="/admin/delete?username={{users[i]['username']}}">DEL</a>&nbsp;&nbsp;<a href="/admin/update?user_name={{users[i]['username']}}&password={{users[i]['password']}}&full_name={{users[i]['fullname']}}">{{users[i]['username']}}</a>: {{users[i]['fullname']}}</li>
+    {%endfor%}
+
+</ol>
+
+<a href="/admin/add">Add New User</a>
+
+</body>
+</html>

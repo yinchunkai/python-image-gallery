@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Update a user</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <h1>Please provide data to update the user:</h1>
+    <form action="/admin/updateUser" method="POST">
+      User name: <input name="user_name" value="{{username}}" disabled /><br />
+      Password: <input name="password" value="{{password}}" /><br />
+      Full name: <input name="full_name" value="{{full_name}}" /><br />
+      <input type="hidden" name="user_name" value="{{username}}">
+      <input type="submit" value="Update Now" />
+    </form>
+    <a href="/admin">Cancel</a>
+  </body>
+</html>
