@@ -8,7 +8,7 @@ class Db():
         json_string = Secrets.get_secret_image_gallery()
         dic = json.loads(json_string)
         self.db_host = dic['host']
-        self.db_name = 'image_gallery' # dic['dbInstanceIdentifier']
+        self.db_name = 'posgres' # dic['dbInstanceIdentifier']
         self.db_user = dic['username']
         self.password = dic['password']
         self.connection = None
