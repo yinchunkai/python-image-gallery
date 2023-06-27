@@ -13,10 +13,12 @@ from functools import wraps
 app = Flask(__name__)
 app.secret_key = b'fowerwksdfoef'
 user_admin = UserAdmin()
-Db.connect()
+d = Db()
+d.connect()
 
 def get_user_dao():
-    return PostgresUserDAO
+    postgresUserDAO = PostgresUserDAO()
+    return postgresUserDAO
 
 def check_admin():
     return 'username' in session and session['username'] == 'fred'
@@ -33,17 +35,25 @@ def requires_admin(view):
 
 @app.route('/invalidLogin')
 def invalidLogin():
-    return "Invalid"
+    return "Invalid username or password"
 
 
 @app.route('/upload')
-def invalidLogin():
+@requires_admin
+def upload():
     return "In process..."
 
 
 @app.route('/view')
-def invalidLogin():
+@requires_admin
+def view():
     return "In process..."
+
+
+@app.route('/', methods=['GET'])
+@requires_admin
+def main():
+    return render_template("main.html")
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -54,7 +64,7 @@ def login():
             return redirect('/invalidLogin')
         else:
             session['username'] = request.form["username"]
-            return redirect("/debugSession")
+            return redirect("/")
     else:
         return render_template("login.html")
 
